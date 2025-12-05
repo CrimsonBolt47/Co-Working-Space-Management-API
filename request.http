@@ -1,0 +1,40 @@
+### GET players
+GET http://localhost:7879/players
+
+###
+
+POST http://localhost:7879/players
+Content-Type: application/json
+
+{
+    "name": "neymar",
+    "age": 27,
+    "wing": 1
+}
+
+###
+POST http://localhost:7879/register
+Content-Type: application/json
+
+{
+    "name": "Peter",
+    "email": "hello@gmail.com",
+    "password": "Pass@123"
+}
+
+###
+
+POST http://localhost:7879/login
+Content-Type: application/json
+
+{
+    "email": "hello@gmail.com",
+    "password": "Pass@123"
+}
+
+### protected failed
+GET http://localhost:7879/protected
+
+### protected success
+GET http://localhost:7879/protected
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic3ViIjoiaGVsbG9AZ21haWwuY29tIiwiZXhwIjoxNzY0NzczMDkyfQ.AsfSJCsGzqy4_C-RZfariux9I82sMqWR4ESAyNThSTU 
