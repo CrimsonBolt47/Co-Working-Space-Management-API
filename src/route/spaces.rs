@@ -9,7 +9,7 @@ use sqlx::{PgPool, QueryBuilder};
 use uuid::Uuid;
 use crate::{models::{admin::{Admin, AuthAdmin, LoginAdmin}, company::{Company, CompanyQueryParams, CreateCompanyReq, UpdateCompanyReq}, employee::{Employee, EmployeePassword, Role}}, utils::{errorhandler::AppError, jwt::{AccessRole, Claims, verify_auth_token}}};
 
-pub async fn create_company(
+pub async fn create_spaces(
     State(pg): State<PgPool>,
     TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
     Json(payload): Json<CreateCompanyReq>
@@ -136,44 +136,6 @@ pub async fn get_companies(
     Ok(Json(response))
 
 
-}
-
-pub async fn get_my_company(
-    State(pg): State<PgPool>,
-    TypedHeader(auth): TypedHeader<Authorization<Bearer>>, 
-) -> Result<(StatusCode, Json<Value>), AppError> {
-
-
-    let claims = verify_auth_token(TypedHeader(auth)).await
-        .map_err(|_| AppError::unauthorized("Invalid Token"))?;
-        
-    if claims.role==AccessRole::Admin {
-        return Err(AppError::forbidden("this is for employees only"))
-    }
-
-    let company_row = sqlx::query!("select comp_id from employees where emp_id = $1", claims.id)
-        .fetch_one(&pg)
-        .await
-        .map_err(AppError::from)?;
-
-
-
-    let company = sqlx::query_as!(
-        Company,
-        "SELECT * FROM companies WHERE comp_id = $1",
-        company_row.comp_id
-    )
-    .fetch_one(&pg)
-    .await
-    .map_err(|e| {
-        if let sqlx::Error::RowNotFound = e {
-            AppError::not_found("Company not found for this employee")
-        } else {
-            AppError::from(e)
-        }
-    })?;
-
-    Ok((StatusCode::OK, Json(json!(company))))
 }
 
 pub async fn update_companies(

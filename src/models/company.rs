@@ -27,3 +27,10 @@ pub struct CompanyQueryParams {
     pub limit: Option<i64>,
     pub company_name: Option<String>
 }
+
+#[derive(Deserialize)]
+pub struct UpdateCompanyReq {
+    pub company_name: Option<String>,
+    pub about: Option<String>,
+}
+
