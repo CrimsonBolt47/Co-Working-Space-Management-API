@@ -126,7 +126,9 @@ dependencies = [
  "serde_json",
  "sqlx",
  "thiserror",
+ "time",
  "tokio",
+ "uuid",
 ]
 
 [[package]]
@@ -373,6 +375,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ececcb659e7ba858fb4f10388c250a7252eb0a27373f1a72b8748afdd248e587"
 dependencies = [
  "powerfmt",
+ "serde_core",
 ]
 
 [[package]]
@@ -1681,10 +1684,12 @@ dependencies = [
  "sha2",
  "smallvec",
  "thiserror",
+ "time",
  "tokio",
  "tokio-stream",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -1763,7 +1768,9 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -1800,7 +1807,9 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -1824,8 +1833,10 @@ dependencies = [
  "serde_urlencoded",
  "sqlx-core",
  "thiserror",
+ "time",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -2102,6 +2113,18 @@ name = "utf8_iter"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
+
+[[package]]
+name = "uuid"
+version = "1.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2e054861b4bd027cd373e18e8d8d8e6548085000e41290d95ce0c373a654b4a"
+dependencies = [
+ "getrandom 0.3.4",
+ "js-sys",
+ "serde_core",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "vcpkg"

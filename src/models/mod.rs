@@ -1,2 +1,6 @@
-pub mod player;
-pub mod user;
+pub mod employee;
+pub mod admin;
+pub mod space;
+pub mod booking;
+pub mod company;
+

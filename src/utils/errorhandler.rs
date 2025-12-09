@@ -13,7 +13,6 @@ pub enum AppError {
     #[error("Database query failed: {0}")]
     SqlxError(#[from] sqlx::Error),
 
-
     #[error("Bad request: {0}")]
     BadRequest(String),
 
@@ -23,9 +22,69 @@ pub enum AppError {
     #[error("Forbidden: {0}")]
     Forbidden(String),
 
+    #[error("Not Found: {0}")]
+    NotFound(String),
+
     #[error("Validation error: {0}")]
     ValidationError(String),
 
-    #[error("Unexpected server error: {0}")]
-    Unexpected(String),
+    #[error("Unexpected server error")]
+    Unexpected,
+}
+
+impl AppError {
+
+
+    pub fn bad_request<T: Into<String>>(msg: T) -> Self {
+        AppError::BadRequest(msg.into())
+    }
+
+    pub fn unauthorized<T: Into<String>>(msg: T) -> Self {
+        AppError::Unauthorized(msg.into())
+    }
+
+    pub fn forbidden<T: Into<String>>(msg: T) -> Self {
+        AppError::Forbidden(msg.into())
+    }
+
+    pub fn not_found<T: Into<String>>(msg: T) -> Self {
+        AppError::NotFound(msg.into())
+    }
+
+    pub fn validation<T: Into<String>>(msg: T) -> Self {
+        AppError::ValidationError(msg.into())
+    }
+
+}
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let (status, message) = match &self {
+            AppError::SqlxError(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
+
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
+
+            AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg.clone()),
+
+            AppError::Forbidden(msg) => (StatusCode::FORBIDDEN, msg.clone()),
+
+            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, msg.clone()),
+
+            AppError::ValidationError(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
+
+            AppError::Unexpected => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
+
+
+        };
+
+        let body = Json(json!({
+            "success": false,
+            "error": {
+                "message": message,
+                "kind": format!("{:?}",self)
+            }
+        }));
+
+        (status, body).into_response()
+    }
 }

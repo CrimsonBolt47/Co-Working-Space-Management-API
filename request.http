@@ -1,40 +1,32 @@
-### GET players
-GET http://localhost:7879/players
-
-###
-
-POST http://localhost:7879/players
+# admin pass - superman@fly67
+POST http://localhost:7879/auth/admin/login
 Content-Type: application/json
 
 {
-    "name": "neymar",
-    "age": 27,
-    "wing": 1
+    "email": "superman@gmail.com",
+    "password": "superman@fly67"
 }
 
-###
-POST http://localhost:7879/register
+### add company with manager
+Post http://localhost:7879/companies
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImEzNDVjZDFjLTRmOWQtNGRhNS05YWUyLWE2NjEyODkyZjA3YyIsInN1YiI6InN1cGVybWFuQGdtYWlsLmNvbSIsInJvbGUiOiJBZG1pbiIsImV4cCI6MTc2NTMwMzYxNX0.9wgRDN0FoLDlBNg685m610Cs66o03X-2kvFa_pP6rsQ
 Content-Type: application/json
 
 {
-    "name": "Peter",
-    "email": "hello@gmail.com",
-    "password": "Pass@123"
+    "company_name": "super",
+    "about": "nothing to talk about it",
+    "manager": {
+        "name": "Peter",
+        "position": "vice president",
+        "email": "manager@gmail.com"
+    }
 }
 
-###
-
-POST http://localhost:7879/login
+### add company with manager
+PATCH  http://localhost:7879/email_verification
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFkY2JhODJmLTlkNzUtNDY0Mi1iN2UwLWM5MWMwNDMxZDMxNiIsInN1YiI6Im1hbmFnZXJAZ21haWwuY29tIiwicm9sZSI6Ik1hbmFnZXIiLCJleHAiOjE3NjUzMDM2MjR9.aZUHTXthu9RVAK8xzUZcamJp9wyyHsxVj7Xiyh3GnT0
 Content-Type: application/json
 
 {
-    "email": "hello@gmail.com",
-    "password": "Pass@123"
+    "password": "new_password"
 }
-
-### protected failed
-GET http://localhost:7879/protected
-
-### protected success
-GET http://localhost:7879/protected
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic3ViIjoiaGVsbG9AZ21haWwuY29tIiwiZXhwIjoxNzY0NzczMDkyfQ.AsfSJCsGzqy4_C-RZfariux9I82sMqWR4ESAyNThSTU 

@@ -1,16 +1,16 @@
 use axum::{
     Router,
-    routing::{get, post},
+    routing::{get, patch, post},
 };
 use sqlx::PgPool;
-use crate::routes::{player::{create_player, get_players}, user::{login_user, protected_route, register_user}};
+
+use crate::route::{admin::login_admin, company::create_company, employee::email_verification};
+
 pub fn create_router(pool: PgPool) -> Router {
     Router::new()
-    .route("/players", get(get_players))
-    .route("/players", post(create_player))
-    .route("/login", post(login_user))
-    .route("/register", post(register_user))
-    .route("/protected", get(protected_route))
-    
+    //admin
+    .route("/auth/admin/login",post(login_admin))
+    .route("/companies", post(create_company))
+    .route("/email_verification",patch(email_verification))
     .with_state(pool)
 }

@@ -4,11 +4,20 @@ use axum_extra::{
 use axum::http::StatusCode;
 use serde::{Deserialize,Serialize};
 use jsonwebtoken::{DecodingKey, Validation, decode};
+use uuid::Uuid;
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub enum AccessRole {
+    Admin,
+    Manager,
+    Employee
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub id: i32,
+    pub id: Uuid,
     pub sub: String,
+    pub role: AccessRole,
     pub exp: usize,
 }
 
