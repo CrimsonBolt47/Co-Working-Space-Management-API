@@ -43,3 +43,11 @@ pub struct SpaceAvailableTimings {
     pub start_time: OffsetDateTime,
     pub end_time: OffsetDateTime,
 }
+
+#[derive(Deserialize, Serialize, FromRow)]
+pub struct SpaceAvailable {
+    pub space_id: Uuid,
+    pub name: String,
+    pub size: i32,
+    pub description: Option<String>,
+}

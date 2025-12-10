@@ -11,7 +11,7 @@ use thiserror::Error;
 pub enum AppError {
 
     #[error("Database query failed: {0}")]
-    SqlxError(#[from] sqlx::Error),
+    DatabaseError(String),
 
     #[error("Bad request: {0}")]
     BadRequest(String),
@@ -34,6 +34,9 @@ pub enum AppError {
 
 impl AppError {
 
+    pub fn database<T: Into<String>>(msg: T) -> Self {
+        AppError::DatabaseError(msg.into())
+    }
 
     pub fn bad_request<T: Into<String>>(msg: T) -> Self {
         AppError::BadRequest(msg.into())
@@ -60,7 +63,7 @@ impl AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, message) = match &self {
-            AppError::SqlxError(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
+            AppError::DatabaseError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
 
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
 

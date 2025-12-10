@@ -27,7 +27,7 @@ pub async fn verify_auth_token(
 
     let token = auth.token();
 
-    let secret = std::env::var("JWT_SECRET").unwrap_or_else(|_| "mysecret".into());
+    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET environment variable must be set");
 
     let token_data = decode(
         token,

@@ -17,7 +17,7 @@ pub struct Company {
 #[derive(Deserialize)]
 pub struct CreateCompanyReq {
     pub company_name: String,
-    pub about: String,
+    pub about: Option<String>,
     pub manager: EmployeeInvite
 }
 

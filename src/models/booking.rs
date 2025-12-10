@@ -48,3 +48,9 @@ pub struct GetCompanyBooking {
     pub start_time: OffsetDateTime,
     pub end_time: OffsetDateTime,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct AvailableBooking {
+    pub start_time: OffsetDateTime,
+    pub end_time: OffsetDateTime,
+}
