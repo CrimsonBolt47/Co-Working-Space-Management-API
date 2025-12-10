@@ -4,7 +4,7 @@ use axum::{
 };
 use sqlx::PgPool;
 
-use crate::route::{admin::login_admin, company::{create_company, delete_company, get_companies, get_company_by_id, get_my_company, update_companies}, employee::{create_employee, delete_employees, email_verification, get_employee_by_id, get_employees, login_employee, update_employees}};
+use crate::route::{admin::login_admin, company::{create_company, delete_company, get_companies, get_company_by_id, get_my_company, update_companies}, employee::{create_employee, delete_employees, email_verification, get_employee_by_id, get_employees, login_employee, update_employees}, spaces::{create_spaces, delete_space, get_spaces, get_spaces_by_id, update_space}};
 
 pub fn create_router(pool: PgPool) -> Router {
     Router::new()
@@ -26,5 +26,12 @@ pub fn create_router(pool: PgPool) -> Router {
     .route("/employees",patch(update_employees))
     .route("/employees",delete(delete_employees))
     //spaces
+    .route("/spaces",post(create_spaces))
+    .route("/spaces:id",get(get_spaces_by_id))
+    .route("/spaces",get(get_spaces))
+    .route("/spaces",patch(update_space))
+    .route("/spaces",delete(delete_space))
+    //booking
+    
     .with_state(pool)
 }

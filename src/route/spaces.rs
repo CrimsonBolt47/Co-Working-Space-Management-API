@@ -7,12 +7,12 @@ use jsonwebtoken::{EncodingKey, Header,encode};
 use serde_json::{json,Value};
 use sqlx::{PgPool, QueryBuilder};
 use uuid::Uuid;
-use crate::{models::{admin::{Admin, AuthAdmin, LoginAdmin}, company::{Company, CompanyQueryParams, CreateCompanyReq, UpdateCompanyReq}, employee::{Employee, EmployeePassword, Role}}, utils::{errorhandler::AppError, jwt::{AccessRole, Claims, verify_auth_token}}};
+use crate::{models::{admin::{Admin, AuthAdmin, LoginAdmin}, company::{Company, CompanyQueryParams, CreateCompanyReq, UpdateCompanyReq}, employee::{Employee, EmployeePassword, Role}, space::{self, CreateSpaceReq, Space, SpaceAvailableTimings, SpaceId, SpaceQueryParams, UpdateSpaceReq}}, utils::{errorhandler::AppError, jwt::{AccessRole, Claims, verify_auth_token}}};
 
 pub async fn create_spaces(
     State(pg): State<PgPool>,
     TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
-    Json(payload): Json<CreateCompanyReq>
+    Json(payload): Json<CreateSpaceReq>
 ) -> Result<(StatusCode,Json<Value>), AppError> {
 
         //check if its accessed by admin only
@@ -24,87 +24,53 @@ pub async fn create_spaces(
             return Err(AppError::forbidden("only administrators have access"));
         }
 
-        //add company
+        //add space
         let mut tx = pg.begin().await.map_err(AppError::from)?;
 
-        let company_row = sqlx::query!("insert into companies (company_name, about) values ($1, $2) returning comp_id", payload.company_name, payload.about)
-            .fetch_one(&mut *tx)
-            .await
-            .map_err(AppError::from)?;
-
-        //add manager
-        let manager_row = sqlx::query!("insert into employees (name, email,comp_id, position,role) values ($1,$2,$3,$4,$5::employee_role) returning emp_id",
-            payload.manager.name,
-            payload.manager.email,
-            company_row.comp_id,
-            payload.manager.position,
-            Role::MNG as Role,
-            )
+        let space_row = sqlx::query_as!(SpaceId,"insert into spaces (name, size, description) values ($1, $2, $3) returning space_id", payload.name, payload.size, payload.description)
             .fetch_one(&mut *tx)
             .await
             .map_err(AppError::from)?;
         
-        //create token
-        let secret = std::env::var("JWT_SECRET").unwrap_or_else(|_| "mysecret".into());
-            let exp = Utc::now() + Duration::hours(1);
-        
-            let claims = Claims{
-                id: manager_row.emp_id,
-                sub: payload.manager.email.clone(),
-                role: AccessRole::Manager,
-                exp: exp.timestamp() as usize,
-            };
-
-            let token = encode(
-                &Header::default(),
-                &claims,
-                &EncodingKey::from_secret(secret.as_bytes()),
-            ).map_err(|_| AppError::Unexpected)?;
         tx.commit().await.map_err(AppError::from)?;
-    Ok((StatusCode::CREATED, Json(json!({"new_password token": token}))))
+    Ok((StatusCode::CREATED, Json(json!({"success": space_row}))))
 }
 
-pub async fn get_company_by_id(
+pub async fn get_spaces_by_id(
     State(pg): State<PgPool>,
-    Path(comp_id): Path<Uuid>,
-    TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
+    Path(space_id): Path<Uuid>,
 ) -> Result<Json<Value>, AppError> {
 
-    let claims = verify_auth_token(TypedHeader(auth)).await.map_err(|_| AppError::unauthorized("do not have access"))?;
-    if claims.role != AccessRole::Admin {
-        return Err(AppError::forbidden("only administrators have access"));
-    }
-
-    let company = sqlx::query_as!(Company, "select * from companies where comp_id = $1", comp_id)
+    let space = sqlx::query_as!(Space, "select * from spaces where space_id = $1", space_id)
         .fetch_one(&pg)
         .await
         .map_err(AppError::from)?;
 
-    Ok(Json(json!(company)))
+    Ok(Json(json!(space)))
 }
 
 
-pub async fn get_companies(
+pub async fn get_spaces(
     State(pg): State<PgPool>,
-    Query(params): Query<CompanyQueryParams>,
-    TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
+    Query(params): Query<SpaceQueryParams>,
 ) -> Result<Json<Value>, AppError> {
     
-    let claims = verify_auth_token(TypedHeader(auth)).await.map_err(|_| AppError::unauthorized("do not have access"))?;
-    if claims.role != AccessRole::Admin {
-        return Err(AppError::forbidden("only administrators have access"));
-    }
 
     let page = params.page.unwrap_or(1);
     let limit = params.limit.unwrap_or(10);
     let offset = (page-1) * limit;
 
-    let mut query_builder = QueryBuilder::new("SELECT * from companies WHERE 1=1");
+    let mut query_builder = QueryBuilder::new("SELECT * from spaces WHERE 1=1");
 
     //name filter
-    if let Some(company_name) = params.company_name{
-        query_builder.push(" AND company_name ILIKE ");
-        query_builder.push_bind(format!("%{}%", company_name));
+    if let Some(name) = params.name{
+        query_builder.push(" AND name ILIKE ");
+        query_builder.push_bind(format!("%{}%", name));
+    };
+
+    if let Some(size) = params.size{
+        query_builder.push(" AND size = ");
+        query_builder.push_bind(format!("%{}%", size));
     };
 
 
@@ -114,13 +80,13 @@ pub async fn get_companies(
     query_builder.push(" OFFSET ");
     query_builder.push_bind(offset);
 
-    let query = query_builder.build_query_as::<Company>();
+    let query = query_builder.build_query_as::<Space>();
 
-    let companies = query.fetch_all(&pg)
+    let spaces = query.fetch_all(&pg)
         .await
     .map_err(|_| AppError::not_found("not found"))?;
 
-    let total_count: i64 = sqlx::query_scalar!("SELECT COUNT(*) FROM companies")
+    let total_count: i64 = sqlx::query_scalar!("SELECT COUNT(*) FROM spaces")
         .fetch_one(&pg)
         .await
     .map_err(|_| AppError::not_found("not found"))?
@@ -131,18 +97,18 @@ pub async fn get_companies(
         "page": page,
         "limit": limit,
         "total": total_count,
-        "data": companies
+        "data": spaces
     });
     Ok(Json(response))
 
 
 }
 
-pub async fn update_companies(
+pub async fn update_space(
     State(pg): State<PgPool>,
-    Path(comp_id): Path<Uuid>,
+    Path(space_id): Path<Uuid>,
     TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
-    Json(payload): Json<UpdateCompanyReq>
+    Json(payload): Json<UpdateSpaceReq>
 ) -> Result<Json<Value>, AppError> 
 {
     
@@ -151,21 +117,21 @@ pub async fn update_companies(
         return Err(AppError::forbidden("only administrators have access"));
     }
 
-    let mut query_builder = sqlx::QueryBuilder::new("UPDATE companies");
+    let mut query_builder = sqlx::QueryBuilder::new("UPDATE spaces");
     let mut separated = query_builder.separated("SET ");
     let mut has_update = false;
 
     let mut tx = pg.begin().await.map_err(AppError::from)?;
 
-    if let Some(name) = payload.company_name {
-        separated.push("company_name = ");
+    if let Some(name) = payload.name {
+        separated.push("name = ");
         separated.push_bind(name);
         has_update = true;
     }
 
-    if let Some(about) = payload.about {
-        separated.push("about = ");
-        separated.push_bind(about);
+    if let Some(size) = payload.size {
+        separated.push("size = ");
+        separated.push_bind(size);
         has_update = true;
     }
 
@@ -173,23 +139,23 @@ pub async fn update_companies(
         return Err(AppError::bad_request("no parameters provided"));
     }
 
-    separated.push("where comp_id = ");
-    separated.push_bind(comp_id);
+    separated.push("where space_id = ");
+    separated.push_bind(space_id);
 
-    let query = query_builder.build_query_as::<Company>();
+    let query = query_builder.build_query_as::<Space>();
 
-    let companies = query.fetch_one(&mut *tx)
+    let spaces = query.fetch_all(&mut *tx)
         .await
     .map_err(|_| AppError::not_found("not found"))?;
 
     tx.commit().await?;
 
-    Ok(Json(json!(companies)))
+    Ok(Json(json!(spaces)))
 }
 
-pub async fn delete_company(
+pub async fn delete_space(
     State(pg): State<PgPool>,
-    Path(comp_id): Path<Uuid>,
+    Path(space_id): Path<Uuid>,
     TypedHeader(auth): TypedHeader<Authorization<Bearer>>,
 ) -> Result<StatusCode,AppError> {
 
@@ -198,12 +164,21 @@ pub async fn delete_company(
         return Err(AppError::forbidden("only administrators have access"));
     }
 
-    sqlx::query!("delete from companies where comp_id = $1",comp_id)
+    sqlx::query!("delete from spaces where space_id = $1",space_id)
     .execute(&pg)
     .await
     .map_err(AppError::from)?;
 
     Ok(StatusCode::OK)
+}
+
+pub async fn get_available_spaces_at_given_time(
+    State(pg): State<PgPool>,
+    Json(payload): Json<SpaceAvailableTimings>
+) -> Result<StatusCode,AppError> {
+
+    sqlx::query_as!("select space_id, size,description,")
+    Ok(())
 }
 
 
