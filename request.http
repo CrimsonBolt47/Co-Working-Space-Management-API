@@ -1,32 +1,204 @@
-# admin pass - superman@fly67
-POST http://localhost:7879/auth/admin/login
+@server = http://127.0.0.1:7870
+
+### ADMIN SECTION
+
+### Admin Login
+POST {{server}}/auth/admin/login
 Content-Type: application/json
 
 {
-    "email": "superman@gmail.com",
-    "password": "superman@fly67"
+    "email": "admin@gmail.com",
+    "password": "admin@pass123"
 }
 
-### add company with manager
-Post http://localhost:7879/companies
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImEzNDVjZDFjLTRmOWQtNGRhNS05YWUyLWE2NjEyODkyZjA3YyIsInN1YiI6InN1cGVybWFuQGdtYWlsLmNvbSIsInJvbGUiOiJBZG1pbiIsImV4cCI6MTc2NTMwMzYxNX0.9wgRDN0FoLDlBNg685m610Cs66o03X-2kvFa_pP6rsQ
+### COMPANY SECTION
+
+### Create Company (Admin only)
+POST {{server}}/companies
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 {
-    "company_name": "super",
-    "about": "nothing to talk about it",
-    "manager": {
-        "name": "Peter",
-        "position": "vice president",
-        "email": "manager@gmail.com"
+    "company_name": "Nice Company",
+    "about": "nice company doing nice things",
+ 
+
+        "manager": {
+        "name": "Raj Patel",
+        "position": "Operations Manager",
+        "email": "raj@nicecompany.com"
     }
 }
 
-### add company with manager
-PATCH  http://localhost:7879/email_verification
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImFkY2JhODJmLTlkNzUtNDY0Mi1iN2UwLWM5MWMwNDMxZDMxNiIsInN1YiI6Im1hbmFnZXJAZ21haWwuY29tIiwicm9sZSI6Ik1hbmFnZXIiLCJleHAiOjE3NjUzMDM2MjR9.aZUHTXthu9RVAK8xzUZcamJp9wyyHsxVj7Xiyh3GnT0
+### Get Company By ID
+GET {{server}}/companies/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+### List Companies
+GET {{server}}/companies?page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+### Update Company
+PATCH {{server}}/companies/550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+{
+    "company_name": "Great Company",
+    "about": "great company"
+}
+
+### Delete Company
+DELETE {{server}}/companies/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+### EMPLOYEE SECTION
+
+### Verify Email / Set Password (after invitation)
+PATCH {{server}}/employees/660e8400-e29b-41d4-a716-446655440001/verify
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDIiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.yclJY8LD5kCIGZJvEjwFM9dJ0S8FKYvKZrUqVEwfvO8
+
+{
+    "password": "mypassword123"
+}
+
+### Employee Login
+POST {{server}}/auth/login/employee
 Content-Type: application/json
 
 {
-    "password": "new_password"
+    "email": "maya@nicecompany.com",
+    "password": "mypassword123"
 }
+
+### Create Employee (Manager only)
+POST {{server}}/employees
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIyMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJzdWIiOiJyYWpAbmljZWNvbXBhbnkuY29tIiwicm9sZSI6Ik1hbmFnZXIifQ.2yJZm3UqXvLF8qPh8gRxN4zA5tL7qR9sQWnMvK2oH0M
+
+{
+    "name": "Maya Singh",
+    "position": "Frontend Dev",
+    "email": "maya@nicecompany.com"
+}
+
+### Get Employee By ID
+GET {{server}}/employees/660e8400-e29b-41d4-a716-446655440001
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIyMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJzdWIiOiJyYWpAbmljZWNvbXBhbnkuY29tIiwicm9sZSI6Ik1hbmFnZXIifQ.2yJZm3UqXvLF8qPh8gRxN4zA5tL7qR9sQWnMvK2oH0M
+
+### List Employees
+GET {{server}}/employees?page=1&limit=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIyMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJzdWIiOiJyYWpAbmljZWNvbXBhbnkuY29tIiwicm9sZSI6Ik1hbmFnZXIifQ.2yJZm3UqXvLF8qPh8gRxN4zA5tL7qR9sQWnMvK2oH0M
+
+### Update Employee
+PATCH {{server}}/employees/660e8400-e29b-41d4-a716-446655440001
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIyMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJzdWIiOiJyYWpAbmljZWNvbXBhbnkuY29tIiwicm9sZSI6Ik1hbmFnZXIifQ.2yJZm3UqXvLF8qPh8gRxN4zA5tL7qR9sQWnMvK2oH0M
+
+{
+    "name": "Maya Singh",
+    "position": "Senior Frontend Dev"
+}
+
+### Delete Employee
+DELETE {{server}}/employees/660e8400-e29b-41d4-a716-446655440001
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIyMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJzdWIiOiJyYWpAbmljZWNvbXBhbnkuY29tIiwicm9sZSI6Ik1hbmFnZXIifQ.2yJZm3UqXvLF8qPh8gRxN4zA5tL7qR9sQWnMvK2oH0M
+
+### Get My Company
+GET {{server}}/me/company
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ0MzBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDMiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.K7dM9vP2qXjWnL5yZeA8bTcF3hGiR4sJ1uV6oWpH2lE
+
+### SPACES SECTION
+
+### Create Space (Admin only)
+POST {{server}}/spaces
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+{
+    "name": "Meeting Room 1",
+    "size": 6,
+    "description": "has a whiteboard and good lighting, window view"
+}
+
+### Create Another Space
+POST {{server}}/spaces
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+{
+    "name": "The Quiet Desk",
+    "size": 1,
+    "description": "corner spot, good for focus"
+}
+
+### Get Space By ID
+GET {{server}}/spaces/770e8400-e29b-41d4-a716-446655440002
+
+### List All Spaces
+GET {{server}}/spaces?page=1&limit=10
+
+### List Spaces by Name
+GET {{server}}/spaces?page=1&limit=10&name=Meeting
+
+### Update Space
+PATCH {{server}}/spaces/770e8400-e29b-41d4-a716-446655440002
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+{
+    "name": "Meeting Room 1 - Refurbished",
+    "size": 8
+}
+
+### Delete Space
+DELETE {{server}}/spaces/770e8400-e29b-41d4-a716-446655440002
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4ifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+### Get Available Spaces (time range)
+GET {{server}}/spaces/available?start_time=2025-12-12T14:00:00Z&end_time=2025-12-12T15:30:00Z
+
+### Get Booked Times for Space
+GET {{server}}/spaces/770e8400-e29b-41d4-a716-446655440002/bookings
+
+### BOOKINGS SECTION
+
+### Create Booking (Employee)
+POST {{server}}/bookings
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ0MzBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDMiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.K7dM9vP2qXjWnL5yZeA8bTcF3hGiR4sJ1uV6oWpH2lE
+
+{
+    "space_id": "770e8400-e29b-41d4-a716-446655440002",
+    "start_time": "2025-12-12T14:00:00Z",
+    "end_time": "2025-12-12T15:30:00Z"
+}
+
+### Extend Booking
+PATCH {{server}}/bookings/880e8400-e29b-41d4-a716-446655440003
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ0MzBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDMiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.K7dM9vP2qXjWnL5yZeA8bTcF3hGiR4sJ1uV6oWpH2lE
+
+{
+    "extra_time": {
+        "secs": 1800,
+        "nanos": 0
+    }
+}
+
+### Cancel Booking
+DELETE {{server}}/bookings/880e8400-e29b-41d4-a716-446655440003
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ0MzBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDMiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.K7dM9vP2qXjWnL5yZeA8bTcF3hGiR4sJ1uV6oWpH2lE
+
+### Get My Bookings
+GET {{server}}/bookings/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ0MzBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDMiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.K7dM9vP2qXjWnL5yZeA8bTcF3hGiR4sJ1uV6oWpH2lE
+
+### Get Company Bookings (Manager only)
+GET {{server}}/bookings/company
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIyMDBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJzdWIiOiJyYWpAbmljZWNvbXBhbnkuY29tIiwicm9sZSI6Ik1hbmFnZXIifQ.2yJZm3UqXvLF8qPh8gRxN4zA5tL7qR9sQWnMvK2oH0M
+
+### Get Booking By ID
+GET {{server}}/bookings/880e8400-e29b-41d4-a716-446655440003
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ0MzBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDMiLCJzdWIiOiJtYXlhQG5pY2Vjb21wYW55LmNvbSIsInJvbGUiOiJFbXBsb3llZSJ9.K7dM9vP2qXjWnL5yZeA8bTcF3hGiR4sJ1uV6oWpH2lE
